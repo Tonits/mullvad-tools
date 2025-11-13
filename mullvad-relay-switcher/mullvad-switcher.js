@@ -1,12 +1,25 @@
 import exec from 'child_process';
 import fs from 'fs';
 
-import * as tools from '../../common/general.js';
+/**
+ * Sleep for a set time
+ * 
+ * 1 000 = 1s 
+ * 10 000 = 10s
+ * 100 000 = 100s / 1 min 40s
+ * 1 000 000 = 1 000s /  16 min 40s
+ * 
+ * @param {*} ms 
+ * @returns 
+ */
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // Read Mullvad relay list and push them into 'relay'-list.
 let relays = [];
 try {
-    const data = fs.readFileSync('../mullvad-tools/mullvad-vpn-relay-list-parser/mullvad-relays.txt', { encoding: 'utf8' });
+    const data = fs.readFileSync('../mullvad-vpn-relay-list-parser/mullvad-relays.txt', { encoding: 'utf8' });
     relays = data.split('\n');
 } catch (err) {
     console.error('Error reading file:', err);
@@ -32,7 +45,7 @@ async function getConnectionStatus() {
     }
 
     // Wait 0,5s for child process to complete
-    await tools.sleep(500);
+    await sleep(500);
     return status;
 }
 
@@ -87,7 +100,7 @@ export default async function switchMullvadRelay() {
             }           
         })
 
-        await tools.sleep(500);
+        await sleep(500);
 
     } catch (error) {
         console.error(error);
@@ -96,7 +109,7 @@ export default async function switchMullvadRelay() {
 
         // Wait until connected
         while (connStatus != "Connected") {
-            await tools.sleep(1000);
+            await sleep(1000);
             connStatus = await getConnectionStatus();
         }
 
